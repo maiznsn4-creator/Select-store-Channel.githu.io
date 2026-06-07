@@ -1,0 +1,394 @@
+<!DOCTYPE html>  
+<html lang="km" class="">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>Select Store - Telegram Channels Marketplace</title>  
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>  
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">  
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruuy+Pro:wght@400;500;600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">  
+    <style>  
+    body {   
+        font-family: 'Kantumruuy Pro', sans-serif;   
+        background-color: #f8fafc;   
+        color: #1e293b;  
+        overflow-x: hidden;  
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }  
+    /* កំណត់ឱ្យធាតុទម្រង់ទាំងឡាយប្រើប្រាស់ពុម្ពអក្សរ Kantumruuy Pro */  
+    input, button, textarea, select {  
+        font-family: 'Kantumruuy Pro', sans-serif;  
+    }  
+    .game-font { font-family: 'Orbitron', sans-serif; }  
+
+    /* White & Blue Theme Card Styles */  
+    .card-box {   
+        background: #ffffff;   
+        border: 1px solid #e2e8f0;   
+        box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.05);  
+        transition: all 0.25s ease;  
+    }  
+    .input-box {   
+        background: #ffffff;   
+        border: 1px solid #cbd5e1;   
+        color: #0f172a;   
+    }  
+    .input-box:focus {  
+        border-color: #3b82f6;  
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);  
+    }  
+    .inner-bill {   
+        background: #f8fafc;   
+        border: 1px solid #e2e8f0;   
+    }  
+
+    /* ស្តាយពិសេសពេលរើសយកកញ្ចប់សេវាកម្ម */  
+    .selected-card {   
+        border-color: #3b82f6 !important;   
+        background: #eff6ff !important;  
+        transform: translateY(-2px);  
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1) !important;  
+    }  
+
+    /* ស្ទីលសម្រាប់ Input បញ្ជាក់កំហុស (Error Alert) */  
+    .input-error {  
+        border-color: #ef4444 !important;  
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;  
+        animation: shake 0.3s ease-in-out;  
+    }  
+    @keyframes shake {  
+        0%, 100% { transform: translateX(0); }  
+        25% { transform: translateX(-4px); }  
+        75% { transform: translateX(4px); }  
+    }  
+
+    /* Dark Mode overrides */
+    .dark body {
+        background-color: #0f172a;
+        color: #f1f5f9;
+    }
+    .dark .bg-white { background-color: #1e293b !important; }
+    .dark .border-slate-200 { border-color: #334155 !important; }
+    .dark .text-slate-800 { color: #f1f5f9 !important; }
+    .dark .text-slate-700 { color: #e2e8f0 !important; }
+    .dark .text-slate-600 { color: #cbd5e1 !important; }
+    .dark .text-slate-500 { color: #94a3b8 !important; }
+    .dark .card-box {
+        background: #1e293b;
+        border-color: #334155;
+    }
+    .dark .input-box {
+        background: #0f172a;
+        border-color: #475569;
+        color: #f8fafc;
+    }
+    .dark .inner-bill {
+        background: #0f172a;
+        border-color: #334155;
+    }
+    .dark .selected-card {
+        border-color: #3b82f6 !important;
+        background: #1e293b-gradient(rgba(59, 130, 246, 0.1)) !important;
+        background-color: rgba(59, 130, 246, 0.1) !important;
+    }
+</style>
+</head>  
+<body class="min-h-screen flex flex-col justify-between relative text-xs">  
+
+<div id="custom-alert" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">  
+    <div class="bg-white border border-slate-200 p-5 rounded-2xl max-w-xs w-full mx-4 text-center shadow-2xl transform scale-90 transition-all duration-300" id="alert-box">  
+        <div id="alert-icon" class="w-12 h-12 bg-blue-50 text-blue-600 border border-blue-100 rounded-full flex items-center justify-center text-xl mx-auto mb-3">  
+            <i class="fas fa-exclamation-triangle"></i>  
+        </div>  
+        <h3 id="alert-title" class="text-slate-900 dark:text-white font-bold text-sm mb-1">សូមពិនិត្យព័ត៌មាន</h3>  
+        <p id="alert-msg" class="text-slate-600 text-[11px] leading-relaxed mb-4 whitespace-pre-line"></p>  
+        <button onclick="closeAlert()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl text-[11px] cursor-pointer shadow-md transition-colors">យល់ព្រម</button>  
+    </div>  
+</div>  
+
+<nav class="bg-white border-b border-slate-200 p-3 sticky top-0 z-50 shadow-sm">  
+    <div class="max-w-5xl mx-auto flex justify-between items-center">  
+        <div class="flex items-center gap-2">  
+            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-md shadow-blue-600/20">  
+                <i class="fab fa-telegram text-white text-base"></i>  
+            </div>  
+            <div>  
+                <span class="game-font font-black tracking-wider text-base text-blue-600">SELECT STORE</span>  
+                <p class="text-[9px] text-slate-400 font-medium -mt-1">Telegram Channels Marketplace</p>  
+            </div>  
+        </div>  
+        
+        <div class="flex items-center gap-3">
+            <button onclick="toggleDarkMode()" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-200 flex items-center justify-center cursor-pointer transition-colors text-xs" title="បិទ/បើកភ្លើង">
+                <i id="theme-icon" class="fas fa-moon"></i>
+            </button>
+            
+            <div class="flex items-center gap-1.5 text-[10px] font-bold text-blue-600 bg-blue-50 dark:bg-blue-950/40 px-2.5 py-1 rounded-md border border-blue-100 dark:border-blue-900">  
+                <i class="fas fa-check-circle animate-pulse"></i> មានស្តុក  
+            </div>  
+        </div>
+    </div>  
+</nav>  
+<main class="max-w-5xl mx-auto px-3 mt-5 w-full flex-grow grid grid-cols-1 lg:grid-cols-4 gap-4 relative z-10">  
+      
+    <div class="lg:col-span-1">  
+        <div class="card-box p-4 rounded-xl lg:sticky lg:top-20 transition-all">  
+            <div class="flex items-center gap-2 mb-3">  
+                <div class="w-6 h-6 bg-blue-50 dark:bg-blue-950 text-blue-600 rounded-md flex items-center justify-center text-[10px] font-bold game-font">01</div>  
+                <h2 class="font-bold text-xs tracking-wide text-slate-800">ព័ត៌មានអ្នកទិញ</h2>  
+            </div>  
+              
+            <div id="hint-msg" class="text-center py-6 border border-dashed border-blue-300 dark:border-blue-800 rounded-lg px-3 text-[11px] text-slate-400">  
+                <i class="fas fa-hand-pointer text-blue-500 text-base animate-bounce mb-1 block"></i>  
+                សូមជ្រើសរើសឆានែលជំហានទី២មុន!  
+            </div>  
+
+            <div id="form-fields" class="space-y-3 hidden">  
+                <div>  
+                    <label class="block text-[11px] font-semibold text-slate-500 mb-1">Telegram Username របស់អ្នក</label>  
+                    <div class="relative">  
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-500 font-bold text-xs">@</span>  
+                        <input type="text" id="input_contact" oninput="cleanInput(this)" placeholder="username_របស់អ្នក" class="w-full input-box rounded-lg py-2 pl-7 pr-3 text-xs font-medium outline-none transition-all">  
+                    </div>  
+                    <p class="text-[9px] text-slate-400 mt-1.5 leading-relaxed">ក្រុមការងារនឹងទាក់ទងទៅកាន់ @Username នេះដើម្បីផ្ទេរសិទ្ធិជូនបង។</p>  
+                </div>  
+            </div>  
+        </div>  
+    </div>  
+
+    <div class="lg:col-span-3 space-y-4">  
+          
+        <div class="card-box p-4 rounded-xl">  
+            <div class="flex items-center gap-2 mb-4">  
+                <div class="w-6 h-6 bg-blue-50 dark:bg-blue-950 text-blue-600 rounded-md flex items-center justify-center text-[10px] font-bold game-font">02</div>  
+                <h2 class="font-bold text-xs tracking-wide text-slate-800">ជ្រើសរើសឆានែល Telegram ដែលចង់ទិញ</h2>  
+            </div>  
+              
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3" id="channels-container">  
+                  
+                <div class="space-y-2">  
+                    <div class="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider flex items-center gap-1 bg-blue-50 dark:bg-blue-950/50 py-1 px-2 rounded border border-blue-100 dark:border-blue-900 w-fit">  
+                        <i class="fas fa-seedling"></i> Start-up  
+                    </div>  
+                    <div onclick="selectChannel(this, 'Channel 100-200 Subs', '100-200', '$0.50 - $1.50')" class="card-box p-3 rounded-lg flex flex-col justify-between h-20 shadow-sm cursor-pointer hover:border-blue-500 transition-all">  
+                        <div class="text-xs font-bold text-slate-700">100 - 200 Subs</div>  
+                        <div class="text-right text-[11px] text-blue-600 font-bold game-font mt-auto">$0.50 - $1.50</div>  
+                    </div>  
+                    <div onclick="selectChannel(this, 'Channel 300-400 Subs', '300-400', '$2.50 - $4.50')" class="card-box p-3 rounded-lg flex flex-col justify-between h-20 shadow-sm cursor-pointer hover:border-blue-500 transition-all">  
+                        <div class="text-xs font-bold text-slate-700">300 - 400 Subs</div>  
+                        <div class="text-right text-[11px] text-blue-600 font-bold game-font mt-auto">$2.50 - $4.50</div>  
+                    </div>  
+                </div>  
+
+                <div class="space-y-2">  
+                    <div class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-1 bg-indigo-50 dark:bg-indigo-950/50 py-1 px-2 rounded border border-indigo-100 dark:border-indigo-900 w-fit">  
+                        <i class="fas fa-fire"></i> Popular  
+                    </div>  
+                    <div onclick="selectChannel(this, 'Channel 500-600 Subs', '500-600', '$4.50 - $5.50')" class="card-box p-3 rounded-lg flex flex-col justify-between h-20 shadow-sm cursor-pointer hover:border-blue-500 transition-all">  
+                        <div class="text-xs font-bold text-slate-700">500 - 600 Subs</div>  
+                        <div class="text-right text-[11px] text-blue-600 font-bold game-font mt-auto">$4.50 - $5.50</div>  
+                    </div>  
+                    <div onclick="selectChannel(this, 'Channel 1k Subs', '1k', '$6.00 - $10.00')" class="card-box p-3 rounded-lg flex flex-col justify-between h-20 shadow-sm cursor-pointer hover:border-blue-500 transition-all">  
+                        <div class="text-xs font-bold text-slate-700">700 - 1k Subs</div>  
+                        <div class="text-right text-[11px] text-blue-600 font-bold game-font mt-auto">$6.00 - $10.00</div>  
+                    </div>  
+                    <div onclick="selectChannel(this, 'Channel 1.5k-2k Subs', '1.5k-2k', '$11.00 - $15.00')" class="card-box p-3 rounded-lg flex flex-col justify-between h-20 shadow-sm cursor-pointer hover:border-blue-500 transition-all">  
+                        <div class="text-xs font-bold text-slate-700">1.5k - 2k Subs</div>  
+                        <div class="text-right text-[11px] text-blue-600 font-bold game-font mt-auto">$11.00 - $15.00</div>  
+                    </div>  
+                </div>  
+
+                <div class="space-y-2">  
+                    <div class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950/50 py-1 px-2 rounded border border-emerald-100 dark:border-emerald-900 w-fit">  
+                        <i class="fas fa-crown"></i> VIP / Big  
+                    </div>  
+                    <div onclick="selectChannel(this, 'Channel 3k-5k Subs', '3k-5k', '$20.00 - $30.00')" class="card-box p-3 rounded-lg flex flex-col justify-between h-20 shadow-sm cursor-pointer hover:border-blue-500 transition-all">  
+                        <div class="text-xs font-bold text-slate-700">3k - 5k Subs</div>  
+                        <div class="text-right text-[11px] text-blue-600 font-bold game-font mt-auto">$20.00 - $30.00</div>  
+                    </div>  
+                    <div onclick="selectChannel(this, 'Channel 5.5k-10k Subs', '5.5k-10k', '$40.00 - $50.00')" class="card-box p-3 rounded-lg flex flex-col justify-between h-20 shadow-sm cursor-pointer hover:border-blue-500 transition-all">  
+                        <div class="text-xs font-bold text-slate-700">5.5k - 10k Subs</div>  
+                        <div class="text-right text-[11px] text-blue-600 font-bold game-font mt-auto">$40.00 - $50.00</div>  
+                    </div>  
+                </div>  
+
+            </div>  
+        </div>  
+
+        <div class="card-box p-4 rounded-xl relative overflow-hidden">  
+            <div class="absolute top-0 left-0 w-full h-[2px] bg-blue-600"></div>  
+            <div class="flex items-center gap-2 mb-3">  
+                <div class="w-6 h-6 bg-blue-50 dark:bg-blue-950 text-blue-600 rounded-md flex items-center justify-center text-[10px] font-bold game-font">03</div>  
+                <h2 class="font-bold text-xs tracking-wide text-slate-800">ពិនិត្យព័ត៌មានវិក្កយបត្រ និងទិញឆានែល</h2>  
+            </div>  
+
+            <div class="inner-bill rounded-lg p-3 mb-4 space-y-2 text-[11px]">  
+                <div class="flex justify-between items-center text-slate-500">  
+                    <span>ប្រភេទផលិតផល៖</span>   
+                    <span class="font-bold text-blue-600">Telegram Channel (ផ្ទេរ Owner)</span>  
+                </div>  
+                <div class="flex justify-between items-center text-slate-500">  
+                    <span>ទំហំសមាជិក (Subs)៖</span>   
+                    <span id="view-subs" class="font-bold game-font text-slate-800">-</span>  
+                </div>  
+                <div class="border-t border-slate-200 dark:border-slate-700 pt-2 flex justify-between items-center">  
+                    <span class="font-semibold text-slate-700">តម្លៃប៉ាន់ស្មាន/ចរចា៖</span>   
+                    <span id="view-price" class="game-font text-base text-blue-600 font-black">$0.00</span>  
+                </div>  
+            </div>  
+
+            <button onclick="sendOrder()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 cursor-pointer text-xs tracking-wide shadow-md shadow-blue-600/10 transition-all">  
+                <i class="fas fa-shopping-cart"></i>   
+                កក់ទិញឆានែលនេះភ្លាមៗ  
+            </button>  
+        </div>  
+
+        <div class="grid grid-cols-2 gap-3 font-bold text-[11px]">  
+            <a href="https://t.me/Select_Store2" target="_blank" class="card-box p-2.5 rounded-lg flex items-center justify-center gap-1.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-all text-center">  
+                <i class="fab fa-telegram"></i> CHANNEL STORE  
+            </a>  
+            <a href="https://t.me/Im_sal88" target="_blank" class="card-box p-2.5 rounded-lg flex items-center justify-center gap-1.5 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 transition-all text-center">  
+                <i class="fas fa-headset"></i> SUPPORT @Im_sal88  
+            </a>  
+        </div>  
+    </div>  
+</main>  
+
+<footer class="text-center p-4 text-[11px] text-slate-400 border-t border-slate-200 dark:border-slate-800 bg-white mt-10 relative z-10">  
+    <p class="tracking-wide">&copy; 2026 Select Store. All Rights Reserved.</p>  
+</footer>  
+
+<script>  
+    let selectedChannelName = "";  
+    let selectedSubsDisplay = "";  
+    let selectedPriceDisplay = "";  
+
+    // មុខងារ ប្តូរពណ៌ បិទ/បើកភ្លើង (Dark Mode Toggle)
+    function toggleDarkMode() {
+        const html = document.documentElement;
+        const icon = document.getElementById('theme-icon');
+        
+        if (html.classList.contains('dark')) {
+            html.classList.remove('dark');
+            icon.className = "fas fa-moon";
+            localStorage.setItem('theme', 'light');
+        } else {
+            html.classList.add('dark');
+            icon.className = "fas fa-sun";
+            localStorage.setItem('theme', 'dark');
+        }
+    }
+
+    // ពិនិត្យមើលសីតុណ្ហភាពភ្លើងដែលអ្នកប្រើធ្លាប់កំណត់ទុកលើកមុន
+    if (localStorage.getItem('theme') === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.getElementById('theme-icon').className = "fas fa-sun";
+    }
+
+    // មុខងារ បើកប្រអប់ដំណឹង (Custom Alert)
+    function showAlert(title, msg, type = 'warning') {  
+        document.getElementById('alert-title').innerText = title;  
+        document.getElementById('alert-msg').innerText = msg;  
+          
+        const iconContainer = document.getElementById('custom-alert').querySelector('.rounded-full');  
+        if(type === 'success') {  
+            iconContainer.className = "w-12 h-12 bg-green-50 dark:bg-green-950 text-green-600 border border-green-100 dark:border-green-900 rounded-full flex items-center justify-center text-xl mx-auto mb-3";  
+            iconContainer.innerHTML = '<i class="fas fa-check-circle"></i>';  
+        } else {  
+            iconContainer.className = "w-12 h-12 bg-blue-50 dark:bg-blue-950 text-blue-600 border border-blue-100 dark:border-blue-900 rounded-full flex items-center justify-center text-xl mx-auto mb-3";  
+            iconContainer.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';  
+        }  
+
+        const modal = document.getElementById('custom-alert');  
+        const box = document.getElementById('alert-box');  
+        modal.classList.remove('opacity-0', 'pointer-events-none');  
+        box.classList.remove('scale-90');  
+        box.classList.add('scale-100');  
+    }  
+
+    // មុខងារ បិទប្រអប់ដំណឹង
+    function closeAlert() {  
+        const modal = document.getElementById('custom-alert');  
+        const box = document.getElementById('alert-box');  
+        modal.classList.add('opacity-0', 'pointer-events-none');  
+        box.classList.remove('scale-100');  
+        box.classList.add('scale-90');  
+    }  
+
+    // មុខងារ លុបសញ្ញា @ និងដក Error Border ពេលកំពុងវាយបញ្ចូល
+    function cleanInput(inputElement) {  
+        if (inputElement.value.includes('@')) {  
+            inputElement.value = inputElement.value.replace(/@/g, '');  
+        }  
+        inputElement.classList.remove('input-error');  
+    }  
+
+    // មុខងារ ជ្រើសរើសកញ្ចប់ឆានែល
+    function selectChannel(element, name, subs, price) {  
+        if (element.classList.contains('selected-card')) {  
+            element.classList.remove('selected-card');   
+            resetSelection();   
+            return;  
+        }  
+
+        document.querySelectorAll('#channels-container .card-box').forEach(box => box.classList.remove('selected-card'));  
+        element.classList.add('selected-card');   
+
+        document.getElementById('hint-msg').classList.add('hidden');  
+        document.getElementById('form-fields').classList.remove('hidden');  
+
+        selectedChannelName = name;  
+        selectedSubsDisplay = subs;  
+        selectedPriceDisplay = price;  
+
+        document.getElementById('view-subs').innerText = subs + " Subs";  
+        document.getElementById('view-price').innerText = price;  
+    }  
+    // មុខងារ Reset ទិន្នន័យ
+    function resetSelection() {  
+        selectedChannelName = "";  
+        selectedSubsDisplay = "";  
+        selectedPriceDisplay = "";  
+
+        document.getElementById('hint-msg').classList.remove('hidden');  
+        document.getElementById('form-fields').classList.add('hidden');  
+        document.getElementById('input_contact').value = "";   
+        document.getElementById('input_contact').classList.remove('input-error');  
+
+        document.getElementById('view-subs').innerText = "-";  
+        document.getElementById('view-price').innerText = "$0.00";  
+    }  
+
+    // មុខងារ បញ្ជូនការកក់ទិញ (រត់ទៅបើក Chat Telegram @Im_RA12 ភ្ជាប់ព័ត៌មានរួចជាស្រេច)
+    function sendOrder() {  
+        const contactInput = document.getElementById('input_contact');  
+        const username = contactInput.value.trim();  
+
+        if (!selectedChannelName) {  
+            showAlert('សូមជ្រើសរើស', 'សូមជ្រើសរើសកញ្ចប់ឆានែល Telegram ដែលអ្នកចង់ទិញជាមុនសិន!');  
+            return;  
+        }  
+
+        if (!username) {  
+            contactInput.classList.add('input-error');  
+            showAlert('ខ្វះព័ត៌មាន', 'សូមបញ្ចូល Telegram Username របស់អ្នកដើម្បីឱ្យយើងទាក់ទងផ្ទេរឆានែលជូន!');  
+            return;  
+        }  
+
+        // រៀបចំសារអត្ថបទផ្ញើទៅកាន់ Telegram
+        const textMessage = `ជំរាបសួរ បងប្រុស! ខ្ញុំចង់កក់ទិញឆានែលមួយ%0A%0A` +
+                            `📦 ឆានែល៖ ${selectedSubsDisplay} Subs%0A` +
+                            `💵 តម្លៃប៉ាន់ស្មាន៖ ${selectedPriceDisplay}%0A` +
+                            `👤 លីង Telegram ខ្ញុំ៖ t.me/${username}%0A%0A` +
+                            `សូមជួយរៀបចំផ្ទេរសិទ្ធិ Owner ឱ្យខ្ញុំផង បាទ/ចាស!`;
+
+        // គណនីចម្បងដែលត្រូវទទួលបានទិន្នន័យទិញ (Im_RA12)
+        const primaryAdmin = "Im_RA12";  
+
+        // បើកលីងទៅកាន់ Telegram របស់បងភ្លាមៗ ព្រមទាំងភ្ជាប់អត្ថបទកក់ស្រាប់ៗ
+        window.open(`https://t.me/${primaryAdmin}?text=${textMessage}`, '_blank');  
+    }  
+</script>
+
+</body>  
+</html>
